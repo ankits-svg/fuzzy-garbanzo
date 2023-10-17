@@ -1,16 +1,27 @@
-const express=require('express')
+const express=require('express');
+const { authRouter } = require('./routes/auth.routes.js');
+const { connection } = require('./config/db.js');
 const app=express()
-const port=4100;
+require('dotenv').config()
+
+const port=process.env.Port || 4200;
 app.use(express.json())
 
 app.get("/",(req,res)=>{
     res.status(200).send({"msg":"Getting the details"})
 })
 
-app.post("/add",(req,res)=>{
-    res.status(200).send({"msg":"Adding to the database"})
-})
+//Authentication
+app.use("/users",authRouter)
 
-app.listen(port,()=>{
+
+app.listen(port,async()=>{
+    try {
+        await connection;
+        console.log("Server connected with mongo database")  
+    } catch (error) {
+        console.log("Cannot connected to Server with mongo database")
+        console.log(error)
+    }
     console.log(`Server is running at ${port}`)
 })
