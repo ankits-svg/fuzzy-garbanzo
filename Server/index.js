@@ -1,6 +1,7 @@
 const express=require('express');
 const { authRouter } = require('./routes/auth.routes.js');
 const { connection } = require('./config/db.js');
+const { recipeRouter } = require('./routes/recipe.routes.js');
 const app=express()
 require('dotenv').config()
 
@@ -13,6 +14,9 @@ app.get("/",(req,res)=>{
 
 //Authentication
 app.use("/users",authRouter)
+
+//Recipes
+app.use("/recipe",recipeRouter)
 
 
 app.listen(port,async()=>{
