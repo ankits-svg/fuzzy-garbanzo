@@ -25,7 +25,7 @@ const authSchema=mongoose.Schema({
         }},
     place:{
         type:String,
-        required: true,
+        required: [true,'Place must not be empty'],
         validate:{
             validator:function(v){
                 return v.length>0

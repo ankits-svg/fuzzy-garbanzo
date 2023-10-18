@@ -3,14 +3,19 @@ const { AuthModel } = require('../model/auth.model');
 const authRouter=express.Router();
 var jwt = require('jsonwebtoken');
 require('dotenv').config()
-
+const bcrypt=require("bcrypt")
+const saltRounds=3;
 /***Registration By The User */
 authRouter.post("/",async(req,res)=>{
     const {email,password,place}=req.body;
     try {
-        const user=new AuthModel({email:email,password:password,place:place})
-        await user.save()
-        res.status(200).send({'msg':"Registration has been done"})
+        bcrypt.hash(password, saltRounds, async(err, hash)=>{
+            // Store hash in your password DB.
+            const user=new AuthModel({email:email,password:hash,place:place})
+            await user.save()
+            res.status(200).send({'msg':"Registration has been done"})
+        });
+        
     } catch (error) {
         res.status(400).send({'msg':error.message})
     }
@@ -21,9 +26,17 @@ authRouter.post("/",async(req,res)=>{
 authRouter.post("/login",async(req,res)=>{
     const {email,password}=req.body;
     try {
-        const user=await AuthModel.findOne({email:email,password:password})
+        const user=await AuthModel.findOne({email:email})
         if(user){
-            res.status(200).send({'msg':"Login Successfull!!",'data':user,'token' : jwt.sign({ foo: 'bar' }, process.env.secret, { expiresIn: '60' })});
+            bcrypt.compare(password, user.password, (err, result)=>{
+                // result == true
+                if(result){
+                    res.status(200).send({'msg':"Login Successfull!!",'data':user,'token' : jwt.sign({ foo: 'bar' }, process.env.secret, { expiresIn: '60' })});
+                }else{
+                    res.status(200).send({"msg":"Wrong Password!!"})
+                }
+            });
+            
         }else{
             res.status(200).send({'msg':"Some error occured in Login"})
         }
