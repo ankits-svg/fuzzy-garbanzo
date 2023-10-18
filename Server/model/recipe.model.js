@@ -1,11 +1,20 @@
 const mongoose=require('mongoose')
 
 const recipeSchema=mongoose.Schema({
-    title:{
+    
+    userId:{
         type:String,
         required:true
     },
+    recipeId:{
+        type:Array,
+        default:[],
+        required:true
+    }
 
+},{
+    timestamps: true,
+    versionKey:false
 })
 
 const RecipeModel=mongoose.model('recipe',recipeSchema)

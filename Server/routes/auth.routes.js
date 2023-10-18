@@ -31,7 +31,7 @@ authRouter.post("/login",async(req,res)=>{
             bcrypt.compare(password, user.password, (err, result)=>{
                 // result == true
                 if(result){
-                    res.status(200).send({'msg':"Login Successfull!!",'data':user,'token' : jwt.sign({ foo: 'bar' }, process.env.secret, { expiresIn: '60' })});
+                    res.status(200).send({'msg':"Login Successfull!!",'data':user,'token' : jwt.sign({ userId: user._id }, process.env.secret, { expiresIn: '60' })});
                 }else{
                     res.status(200).send({"msg":"Wrong Password!!"})
                 }
