@@ -24,28 +24,48 @@ import { useParams } from 'react-router-dom';
 
 const Details = ({ recipe }) => {
   const { id } = useParams();
-  const [foodData, setFoodData] = useState([]);
+  const [rec,setRec]=useState([])
+  const [Id,setId]=useState(null)
+  console.log("rec:",rec)
+    
+    useEffect(()=>{
+      // fetch(`https://api.spoonacular.com/recipes/random?apiKey=${key}&number=${num}`).then(res=>res.json()).then(res=>{
+      //   console.log("details:",res)
+      //   setRec(res.recipes)
+      // }).catch(err=>{
+      //   console.log(err)
+      // })
+      const userData=JSON.parse(localStorage.getItem('userData'))
+      setId(userData._id)
+      let food=JSON.parse(localStorage.getItem('food'))
+      console.log("food:",food)
+      setRec(food)
+    },[])
 
-  // Fetch data from local storage when the component mounts
-  useEffect(() => {
-    const fetchDataFromLocalStorage = () => {
-      const food = JSON.parse(localStorage.getItem('food'));
-      setFoodData(food);
-    };
-
-    fetchDataFromLocalStorage();
-  }, []);
-
-  if (!foodData || foodData.length === 0) {
+  if (!rec || rec.length === 0) {
     return <div>Loading...</div>;
   }
 
-  const match = foodData.find((el) => el.id === +id);
-
+  const match = rec.find((el) => el.id === +id);
+  console.log("match:",match,rec)
   if (!match) {
-    return <div>Loading...</div>;
+    return <div>No matching recipe found.</div>;
   }
-
+  
+  const handleSave=()=>{
+    console.log("ankit")
+    fetch(`http://localhost:4100/recipe/saved?apiKey=17be99a7ad524f6eaf2e4da9306f6427&userId=${Id}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ userId:Id, recipeId:match.id }),
+    }).then(res=>res.json()).then(res=>{
+      console.log(res)
+    }).catch(err=>{
+      console.log(err)
+    })
+  }
   return (
     <Container maxW={'7xl'}>
       <SimpleGrid columns={{ base: 1, lg: 2 }} spacing={{ base: 8, md: 10 }} py={{ base: 18, md: 24 }}>
@@ -169,7 +189,9 @@ const Details = ({ recipe }) => {
             _hover={{
               transform: 'translateY(2px)',
               boxShadow: 'lg',
-            }}>
+            }}
+            onClick={handleSave}
+            >
             Save Item
           </Button>
 

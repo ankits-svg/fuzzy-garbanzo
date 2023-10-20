@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import './App.css';
 import Allroutes from './Components/Allroutes';
+import Navbar from './Components/Navbar';
 // import Navbar from './Components/Navbar';
 // import Signup from './Components/Signup';
 
@@ -30,7 +31,10 @@ function App() {
       ) 
       : 
       (
-      <Allroutes recipe={data} />
+        <>
+        <Navbar/>
+        <Allroutes recipe={data} />
+        </>
     )}
       {/* <Signup/> */}
     </div>

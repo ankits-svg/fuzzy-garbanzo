@@ -1,5 +1,5 @@
-"use client";
 import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Flex,
   Box,
@@ -13,34 +13,86 @@ import {
   Text,
   useColorModeValue,
 } from "@chakra-ui/react";
-import { Link } from "react-router-dom";
+import { useToast } from '@chakra-ui/react'
+import { Spinner } from '@chakra-ui/react'
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
+  const [loading, setLoading] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const toast = useToast();
+  const navigate = useNavigate();
+  const bgColor = useColorModeValue("gray.50", "gray.800");
   const handleSignin = () => {
-    let obj = {
+    setLoading(true);
+
+    const payload = {
       email,
-      password,
+      password
     };
-    console.log(obj);
-    setEmail("");
-    setPassword("");
+
+    fetch("http://localhost:4100/users/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        console.log(res)
+        if (res.msg === 'Login Successfull!!') {
+          toast({
+            title: 'Login successful',
+            description: "You've successfully logged in to your account.",
+            status: 'success',
+            duration: 5000,
+            isClosable: true,
+          });
+          // Redirect to the home page on successful login
+          setShowSuccess(true);
+          setTimeout(()=>{
+            navigate('/home');
+          },2000)
+        } else {
+          toast({
+            title: 'Login Error',
+            description: res.msg,
+            status: 'error',
+            duration: 5000,
+            isClosable: true,
+          });
+        }
+      })
+      .catch((err) => {
+        toast({
+          title: 'Login Error',
+          description: err.msg,
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+        });
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   };
+
   return (
     <Flex
       minH={"100vh"}
       align={"center"}
       justify={"center"}
-      bg={useColorModeValue("gray.50", "gray.800")}
+      bg={bgColor}
       backgroundImage={
         'url(https://images.unsplash.com/photo-1600267175161-cfaa711b4a81?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80)'
       }
       backgroundSize={'cover'}
       backgroundPosition={'center center'}
     >
-      <Stack spacing={8} mx={"auto"} maxW={"lg"} py={12} px={6}>
+      {!showSuccess ? (
+        <Stack spacing={8} mx={"auto"} maxW={"lg"} py={12} px={6}>
         <Stack align={"center"}>
           <Heading fontSize={"4xl"}>Sign in to your account</Heading>
           <Text fontSize={"lg"} color={"gray.600"}>
@@ -49,7 +101,7 @@ const Login = () => {
         </Stack>
         <Box
           rounded={"lg"}
-          bg={useColorModeValue("white", "gray.700")}
+          bg={bgColor}
           boxShadow={"lg"}
           p={8}
         >
@@ -77,7 +129,6 @@ const Login = () => {
                 direction={{ base: "column", sm: "row" }}
                 align={"start"}
                 justify={"space-between"}
-            
               >
                 <Checkbox>Remember me</Checkbox>
                 <Text color={"blue.400"}>Forgot password?</Text>
@@ -89,20 +140,31 @@ const Login = () => {
                   bg: "blue.500",
                 }}
                 onClick={handleSignin}
+                disabled={loading} 
               >
-                Sign in
+                {loading ? 
+                <p>...Loading</p>
+                : "Sign in"}
               </Button>
             </Stack>
           </Stack>
           <Stack pt={6}>
-              <Text align={"center"}>
-                New user? <Link color={"blue.400"} to={"/"}>Signup</Link>
-              </Text>
-            </Stack>
+            <Text align={"center"}>
+              New user? <Link color={"blue.400"} to={"/"}>Signup</Link>
+            </Text>
+          </Stack>
         </Box>
       </Stack>
-      
+      )
+      :
+      (<Spinner
+        color="red.500"
+        style={{ margin: "auto" }}
+        height={50}
+        width={50}
+      />)}
     </Flex>
   );
 };
+
 export default Login;

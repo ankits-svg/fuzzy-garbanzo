@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Grid,
@@ -10,25 +10,45 @@ import {
   Tooltip,
   Flex,
   HStack,
+  Input,
 } from "@chakra-ui/react";
 import { FaHeart } from "react-icons/fa";
 import Navbar from "./Navbar";
 import { useNavigate } from "react-router-dom";
 
-const HomePage = ({ recipe }) => {
+const HomePage = () => {
+  
+
     const navigate=useNavigate()
+    const [rec,setRec]=useState([])
+    const key="b72784a8b62e4eac9287f2976452d01a"
+    const num=15
+    useEffect(()=>{
+      fetch(`https://api.spoonacular.com/recipes/random?apiKey=${key}&number=${num}`).then(res=>res.json()).then(res=>{
+        console.log(res)
+        setRec(res.recipes)
+        localStorage.setItem('food',JSON.stringify(res.recipes))
+      }).catch(err=>{
+        console.log(err)
+      })
+    },[])
+
+
+
   const handleDetails = (id) => {
     console.log("id:", id);
     localStorage.setItem("lastId",id)
     navigate(`/details/${id}`)
   };
+
+  
+
   return (
     <Box>
       {/* Navbar */}
       <Box position="fixed" top="0" left="0" right="0" zIndex="999">
         <Navbar />
       </Box>
-
       <Box p={6} mt={20}>
         <Grid
           templateColumns={{
@@ -38,7 +58,7 @@ const HomePage = ({ recipe }) => {
           }}
           gap={4}
         >
-          {recipe.map((el) => (
+          {rec.map((el) => (
             <GridItem key={el.id}>
               <Box
                 borderWidth="1px"
