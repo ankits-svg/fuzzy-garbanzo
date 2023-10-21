@@ -1,14 +1,5 @@
 "use client";
 import React from "react";
-
-// const Signup = () => {
-//   return (
-//     <div>
-
-//     </div>
-//   )
-// }
-
 import {
   Flex,
   Box,
@@ -24,6 +15,7 @@ import {
   Text,
   useColorModeValue,
   Spinner,
+  useToast,
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
@@ -36,23 +28,22 @@ const Signup = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [location, setLocation] = useState("");
-  const [loading,setLoading]=useState(false)
+  // const [loading,setLoading]=useState(false)
   const navigate=useNavigate()
   const bg=useColorModeValue("gray.50", "gray.800")
   const bb=useColorModeValue("white", "gray.700")
+  const toast = useToast();
+
   const handleSignup = () => {
-    let obj={
-      first,
-      last
-    }
-    localStorage.setItem("name",JSON.stringify(obj))
     const payload = {
+      first,
+      last,
       email,
       password,
       place: location,
     };
-    console.log(payload);
-    setLoading(false)
+    // console.log(payload);
+    // setLoading(false)
     fetch("http://localhost:4100/users/", {
       method: "POST",
       headers: {
@@ -62,17 +53,40 @@ const Signup = () => {
     })
       .then((res) => res.json())
       .then((res) => {
-        console.log("signupdata",res.data)
+        // console.log("signupdata",res.data)
         
+        // setLoading(true)
         localStorage.setItem('userData',JSON.stringify(res.data))
-        setLoading(true)
+        
         if(res.msg="Registration has been done"){
-          navigate("/login")
+          toast({
+            title: "Signup successful!",
+            status: "success",
+            duration: 3000,
+            isClosable: true,
+          });
+          // <Spinner/>
+          setTimeout(() => {
+            navigate("/login");
+          }, 3000);
+        }else {
+          // Show an error toast
+          toast({
+            title: "Signup failed. Please try again.",
+            status: "error",
+            duration: 3000,
+            isClosable: true,
+          });
         }
       })
       .catch((err) => {
-        console.log(err.msg)
-        setLoading(false)
+        toast({
+          title: "Network error. Signup failed.",
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
+        // setLoading(false)
       });
     setFirst("");
     setLast("");
@@ -95,11 +109,11 @@ const Signup = () => {
     >
       <Stack spacing={8} mx={"auto"} maxW={"lg"} py={12} px={6}>
       <Stack align={"center"}>
-        <Heading fontSize={"4xl"} textAlign={"center"}>
-          Sign up
+        <Heading fontSize={"4xl"} textAlign={"center"} color={'white'}>
+          Join the Community
         </Heading>
-        <Text fontSize={"lg"} color={"gray.600"}>
-          to enjoy all of our cool features ✌️
+        <Text fontSize={"lg"} color={"white"}>
+          Discover a world of exciting flavors and recipes! 🍽️
         </Text>
       </Stack>
       <Box

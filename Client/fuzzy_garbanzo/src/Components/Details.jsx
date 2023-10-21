@@ -17,6 +17,8 @@ import {
     ListIcon,
     OrderedList,
     UnorderedList,
+    useToast,
+    Spinner,
 } from '@chakra-ui/react';
 
 import { MdCheckCircle, MdLocalShipping } from 'react-icons/md';
@@ -26,44 +28,67 @@ const Details = ({ recipe }) => {
   const { id } = useParams();
   const [rec,setRec]=useState([])
   const [Id,setId]=useState(null)
-  console.log("rec:",rec)
-    
+  const toast = useToast();
+    const key="10f1f1df1f984a679ca56831956747fb"
     useEffect(()=>{
-      // fetch(`https://api.spoonacular.com/recipes/random?apiKey=${key}&number=${num}`).then(res=>res.json()).then(res=>{
-      //   console.log("details:",res)
-      //   setRec(res.recipes)
-      // }).catch(err=>{
-      //   console.log(err)
-      // })
-      const userData=JSON.parse(localStorage.getItem('userData'))
-      setId(userData._id)
+      const userLogin=JSON.parse(localStorage.getItem('userLogin'))
+      setId(userLogin._id)
       let food=JSON.parse(localStorage.getItem('food'))
-      console.log("food:",food)
+      // console.log("food:",food)
       setRec(food)
     },[])
 
   if (!rec || rec.length === 0) {
-    return <div>Loading...</div>;
+    return <Spinner
+    thickness='4px'
+    speed='0.65s'
+    emptyColor='gray.200'
+    color='blue.500'
+    size='xl'
+  />;
   }
 
   const match = rec.find((el) => el.id === +id);
-  console.log("match:",match,rec)
+  // console.log("match:",match,rec)
   if (!match) {
     return <div>No matching recipe found.</div>;
   }
   
   const handleSave=()=>{
-    console.log("ankit")
-    fetch(`http://localhost:4100/recipe/saved?apiKey=17be99a7ad524f6eaf2e4da9306f6427&userId=${Id}`, {
+    // console.log("ankit")
+    fetch(`http://localhost:4100/recipe/saved?apiKey=${key}&userId=${Id}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ userId:Id, recipeId:match.id }),
+      body: JSON.stringify({ userId:Id, recipeId:match.id, title: match.title, image: match.image }),
     }).then(res=>res.json()).then(res=>{
-      console.log(res)
+      if (res.msg === 'Recipe saved successfully') {
+        // Show a success toast
+        toast({
+          title: 'Item Saved',
+          description: 'The item has been saved successfully.',
+          status: 'success',
+          duration: 5000,
+          isClosable: true,
+        });
+      } else {
+        toast({
+          title: 'Error',
+          description: 'An error occurred while saving the item.',
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+        });
+      }
     }).catch(err=>{
-      console.log(err)
+      toast({
+        title: 'Error',
+        description: 'An error occurred while saving the item.',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
     })
   }
   return (

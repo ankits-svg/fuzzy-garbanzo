@@ -11,6 +11,7 @@ import {
   Flex,
   HStack,
   Input,
+  useToast,
 } from "@chakra-ui/react";
 import { FaHeart } from "react-icons/fa";
 import Navbar from "./Navbar";
@@ -18,14 +19,15 @@ import { useNavigate } from "react-router-dom";
 
 const HomePage = () => {
   
-
+    const [saved,setSaved]=useState(false)
+    const toast = useToast();
     const navigate=useNavigate()
     const [rec,setRec]=useState([])
-    const key="b72784a8b62e4eac9287f2976452d01a"
+    const key="10f1f1df1f984a679ca56831956747fb"
     const num=15
     useEffect(()=>{
       fetch(`https://api.spoonacular.com/recipes/random?apiKey=${key}&number=${num}`).then(res=>res.json()).then(res=>{
-        console.log(res)
+        // console.log(res)
         setRec(res.recipes)
         localStorage.setItem('food',JSON.stringify(res.recipes))
       }).catch(err=>{
@@ -36,13 +38,32 @@ const HomePage = () => {
 
 
   const handleDetails = (id) => {
-    console.log("id:", id);
-    localStorage.setItem("lastId",id)
+    // console.log("id:", id);
+    // localStorage.setItem("lastId",id)
     navigate(`/details/${id}`)
   };
+  const user=JSON.parse(localStorage.getItem('userLogin'))
 
-  
-
+  const handleBookmark=(el)=>{
+    fetch(`http://localhost:4100/recipe/saved?apiKey=17be99a7ad524f6eaf2e4da9306f6427&userId=${user._id}`,{
+      method:'POST',
+      headers:{
+        "Content-Type":"application/json"
+      },
+      body:JSON.stringify({ userId:user._id, recipeId:el.id, title: el.title, image: el.image })
+    }).then(res=>res.json()).then(res=>{
+      // console.log(res)
+      setSaved(true);
+          toast({
+            title: 'Item saved to favorites',
+            status: 'success',
+            duration: 3000,
+            isClosable: true,
+          });
+    }).catch(err=>{
+      console.log(err)
+    })
+  }
   return (
     <Box>
       {/* Navbar */}
@@ -124,6 +145,7 @@ const HomePage = () => {
                           variant="ghost"
                           aria-label="Bookmark Recipe"
                           size="lg"
+                          onClick={()=>handleBookmark(el)}
                         />
                       </Tooltip>
                     </HStack>

@@ -1,130 +1,3 @@
-// import React, { useState } from 'react';
-// import {
-//   Box,
-//   Flex,
-//   Heading,
-//   Input,
-//   HStack,
-//   Text,
-//   Image,
-//   IconButton,
-//   Menu,
-//   MenuButton,
-//   MenuList,
-//   MenuItem,
-//   Spacer,
-//   InputGroup,
-//   InputLeftElement,
-//   InputRightElement,
-//   useDisclosure
-// } from '@chakra-ui/react';
-// import { FaHeart, FaUser,FaSearch } from 'react-icons/fa';
-// import {
-//   Drawer,
-//   DrawerBody,
-//   DrawerFooter,
-//   DrawerHeader,
-//   DrawerOverlay,
-//   DrawerContent,
-//   DrawerCloseButton,
-// } from '@chakra-ui/react'
-
-// const Navbar = ({handleSearch}) => {
-
-//   const [searchTerm, setSearchTerm] = useState('');
-//   const [searchdata, setSearchdata] = useState([]);
-//   const [loading, setLoading] = useState(false);
-//   const [draw,setDraw]=useState(false)
-//   const { isOpen, onOpen, onClose } = useDisclosure()
-
-//   // const handleSearch = () => {
-//   //   if (!searchTerm) {
-//   //     return;
-//   //   }
-//   //   setLoading(true);
-//   //   fetch(`http://localhost:4100/recipe/search?apiKey=17be99a7ad524f6eaf2e4da9306f6427&query=${searchTerm}`)
-//   //     .then((res) => res.json())
-//   //     .then((res) => {
-//   //       console.log(res.Data)
-//   //       setSearchdata(res.Data);
-//   //       setDraw(true)
-//   //       setLoading(false);
-//   //     })
-//   //     .catch((err) => {
-//   //       console.log(err);
-//   //       setLoading(false);
-//   //     });
-//   // };
-
-//   const handleKeyPress = (event) => {
-//     if (event.key === 'Enter') {
-//       handleSearch();
-//     }
-//   };
-
-
-
-//   return (
-    
-// <Flex
-//       as="nav"
-//       p={4}
-//       alignItems="center"
-//       justifyContent="space-between"
-//       bg="blue.500"
-//       color="white"
-//     >
-//       <Heading size="md" fontFamily={`'Carattere', 'Dancing Script', cursive`}>Fuzzy-Garbanzo</Heading>
-
-//       <Box>
-//         <InputGroup size="md">
-          
-//           <Input
-//             type="text"
-//             placeholder="Search..."
-//             borderColor="white"
-//             borderRadius="full"
-//             bg="white"
-//             color="gray"
-//             value={searchTerm}
-//             onChange={(e) => setSearchTerm(e.target.value)}
-//             onKeyPress={handleKeyPress}
-//           />
-//           <InputRightElement
-//             pointerEvents="auto"
-//             onClick={handleSearch}
-//             children={<FaSearch color="black" cursor={'pointer'}/>}
-//           />
-//         </InputGroup>
-//       </Box>
-
-//       <HStack spacing={4}>
-//         <IconButton
-//           aria-label="Favorites"
-//           icon={<FaHeart />}
-//           size="sm"
-//         />
-
-//         <Menu>
-//         <MenuItem icon={<FaHeart/>}>Favorite</MenuItem>
-//         <MenuButton
-//           as={IconButton}
-//           aria-label="Search"
-//           icon={<FaSearch />}
-//           size="sm"
-//           variant="outline"
-//         />
-//         <MenuItem icon={<FaUser/>}>Profile</MenuItem>
-//         </Menu>
-//       </HStack>
-//     </Flex>
-    
-    
-//   );
-// };
-
-// export default Navbar;
-
 'use client'
 
 import {
@@ -145,8 +18,9 @@ import {
   Stack,
 } from '@chakra-ui/react'
 import { HamburgerIcon, CloseIcon } from '@chakra-ui/icons'
-import { Link } from 'react-router-dom';
-
+import { Link,useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { Show, Hide } from '@chakra-ui/react'
 
 interface Props {
   children: React.ReactNode
@@ -178,7 +52,25 @@ const NavLink = (props: Props) => {
 
 const Navbar=()=> {
   const { isOpen, onOpen, onClose } = useDisclosure()
+  const userLogin=JSON.parse(localStorage.getItem('userLogin'))
+  const first=userLogin.first;
+  const last=userLogin.last;
+  const [flag,setFlag]=useState(false)
+  const navigate = useNavigate();
 
+  const a=useColorModeValue('gray.200', 'gray.700')
+  const handleLogout = () => {
+    setFlag(!flag)
+    navigate('/login');
+  };
+
+  const handleProfile=()=>{
+    navigate("/profile")
+  }
+
+  const handleLogin=()=>{
+    navigate("/login")
+  }
   return (
     <>
       <Box bg={useColorModeValue('gray.100', 'gray.900')} px={4}>
@@ -230,18 +122,16 @@ const Navbar=()=> {
                 variant={'link'}
                 cursor={'pointer'}
                 minW={0}>
-                <Avatar
-                  size={'sm'}
-                  src={
-                    'https://images.unsplash.com/photo-1493666438817-866a91353ca9?ixlib=rb-0.3.5&q=80&fm=jpg&crop=faces&fit=crop&h=200&w=200&s=b616b2c5b373a80ffc9636ba24f7a4a9'
-                  }
-                />
+                <Flex alignItems={'center'} gap={2}>
+                <Avatar size="sm" name={`${first} ${last}`} src="url_of_default_image" color={'white'}/>
+                <Hide size={'sm'}>{flag===true ? "" : <Text>{first}{" "}{last}</Text>}</Hide>
+                </Flex>
               </MenuButton>
               <MenuList>
-                <MenuItem>Profile</MenuItem>
-                <MenuItem>Settings</MenuItem>
+                <MenuItem onClick={handleProfile}>Profile</MenuItem>
+                <MenuItem onClick={handleLogin}>Try with diffrent account</MenuItem>
                 <MenuDivider />
-                <MenuItem>Logout</MenuItem>
+                <MenuItem onClick={handleLogout}>Logout</MenuItem>
               </MenuList>
             </Menu>
           </Flex>
@@ -250,9 +140,30 @@ const Navbar=()=> {
         {isOpen ? (
           <Box pb={4} display={{ md: 'none' }}>
             <Stack as={'nav'} spacing={4}>
-              {Links.map((link) => (
-                <NavLink key={link.text}>{link}</NavLink>
-              ))}
+            <Box
+                as="a"
+                px={2}
+                py={1}
+                rounded={'md'}
+                _hover={{
+                  textDecoration: 'none',
+                  bg: a,
+                }}
+                href={Links[0].path}>
+                {Links[0].text}
+              </Box>
+              <Box
+                as="a"
+                px={2}
+                py={1}
+                rounded={'md'}
+                _hover={{
+                  textDecoration: 'none',
+                  bg: a,
+                }}
+                href={Links[1].path}>
+                {Links[1].text}
+              </Box>
             </Stack>
           </Box>
         ) : null}

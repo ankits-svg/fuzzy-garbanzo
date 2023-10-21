@@ -42,7 +42,9 @@ const Login = () => {
       .then((res) => res.json())
       .then((res) => {
         console.log(res)
+        localStorage.setItem('token',res.token)
         if (res.msg === 'Login Successfull!!') {
+          localStorage.setItem('userLogin',JSON.stringify(res.data))
           toast({
             title: 'Login successful',
             description: "You've successfully logged in to your account.",
@@ -94,9 +96,11 @@ const Login = () => {
       {!showSuccess ? (
         <Stack spacing={8} mx={"auto"} maxW={"lg"} py={12} px={6}>
         <Stack align={"center"}>
-          <Heading fontSize={"4xl"}>Sign in to your account</Heading>
-          <Text fontSize={"lg"} color={"gray.600"}>
-            to enjoy all of our cool <Text color={"blue.400"}>features</Text> ✌️
+          <Heading fontSize={"4xl"} textAlign={"center"} color={'white'}>
+            Sign In
+          </Heading>
+          <Text fontSize={"lg"} color={"white"}>
+            Discover a world of exciting flavors and recipes! 🍽️
           </Text>
         </Stack>
         <Box
@@ -143,7 +147,7 @@ const Login = () => {
                 disabled={loading} 
               >
                 {loading ? 
-                <p>...Loading</p>
+                <Spinner color='red.500' />
                 : "Sign in"}
               </Button>
             </Stack>
