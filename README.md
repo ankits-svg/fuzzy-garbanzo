@@ -56,7 +56,8 @@ Before you begin, ensure you have met the following requirements:
 
 6. Start the frontend development server:
     ```bash
-    cd client\ cd fuzz_garbanzo
+    cd client
+    cd fuzzy_garbanzo
     npm start
 
 7. The app should now be running. Open your web browser and go to http://localhost:3000/ to access the Fuzzy Garbanzo app.
