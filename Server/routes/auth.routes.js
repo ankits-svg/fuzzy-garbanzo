@@ -7,13 +7,13 @@ const bcrypt=require("bcrypt")
 const saltRounds=3;
 /***Registration By The User */
 authRouter.post("/",async(req,res)=>{
-    const {email,password,place}=req.body;
+    const {first,last,email,password,place}=req.body;
     try {
         bcrypt.hash(password, saltRounds, async(err, hash)=>{
             // Store hash in your password DB.
-            const user=new AuthModel({email:email,password:hash,place:place})
+            const user=new AuthModel({first:first,last:last,email:email,password:hash,place:place})
             await user.save()
-            res.status(200).send({'msg':"Registration has been done"})
+            res.status(200).send({'msg':"Registration has been done",'data':user})
         });
         
     } catch (error) {
@@ -44,6 +44,8 @@ authRouter.post("/login",async(req,res)=>{
         res.status(400).send({"msg":error.message})
     }
 })
+
+
 
 module.exports={
     authRouter

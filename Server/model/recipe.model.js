@@ -10,6 +10,14 @@ const recipeSchema=mongoose.Schema({
         type:Array,
         default:[],
         required:true
+    },
+    title: {
+        type: String,
+        required: true
+    },
+    image: {
+        type: String,
+        required: true
     }
 
 },{

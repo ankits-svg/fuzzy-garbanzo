@@ -2,11 +2,14 @@ const express=require('express');
 const { authRouter } = require('./routes/auth.routes.js');
 const { connection } = require('./config/db.js');
 const { recipeRouter } = require('./routes/recipe.routes.js');
+
 const app=express()
 require('dotenv').config()
 
 const port=process.env.Port || 4200;
 app.use(express.json())
+const cors=require("cors")
+app.use(cors())
 
 app.get("/",(req,res)=>{
     res.status(200).send({"msg":"Getting the details"})

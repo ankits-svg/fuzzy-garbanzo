@@ -1,6 +1,8 @@
 const mongoose=require('mongoose')
 
 const authSchema=mongoose.Schema({
+    first:{type:String, required: true},
+    last:{type:String, required: true},
     email:{
         type:String,
         required: [true, 'User email is required'],
